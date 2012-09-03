@@ -7,8 +7,8 @@ import bson
 
 # custom RESTful response used when updating/deleting model
 # with no content in response 
-no_content = NoContent = web.webapi._status_code("204 No Content")
-custom_error = CustomError = web.webapi._status_code("416 Error Test")
+web.no_content = NoContent = web.webapi._status_code("204 No Content")
+web.custom_error = CustomError = web.webapi._status_code("416 Error Test")
 
 # set MongoDB connection  
 connection = pymongo.Connection("localhost", 27017)
@@ -59,11 +59,11 @@ class todos:
         db.todos.save(data)
 
         # res = json.dumps(db.todos.find_one(bson.objectid.ObjectId(_id)), default=todo_json_encoding)
-        return no_content()
+        return web.no_content()
 
     def DELETE(self, _id):
         db.todos.remove(bson.objectid.ObjectId(_id))
-        return no_content()
+        return web.no_content()
 
 
 if __name__ == "__main__":
