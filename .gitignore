@@ -1,0 +1,6 @@
+static/**/*
+static/favicon.ico
+*.pyc
+
+!static/css/base.css
+!static/js/application.coffee
