@@ -1,29 +1,12 @@
-import web
-import json
-import random
+import web, json, random
 import pymongo
-import bson
+from bson.objectid import ObjectId
+from utils import *
 
-
-# custom RESTful response used when updating/deleting model
-# with no content in response 
-web.no_content = NoContent = web.webapi._status_code("204 No Content")
-web.custom_error = CustomError = web.webapi._status_code("416 Error Test")
 
 # set MongoDB connection  
 connection = pymongo.Connection("localhost", 27017)
 db = connection.test
-
-# fix the ObjectId issue when encoding/decoding JSON object
-def todo_json_encoding(obj):
-    if isinstance(obj, bson.objectid.ObjectId):
-        return str(obj)
-    else:
-        return obj
-
-def todo_json_decoding(obj):
-    obj['_id'] = bson.objectid.ObjectId(obj['_id'])
-    return obj
 
 
 urls = (
@@ -42,27 +25,23 @@ class home:
 
 class todos:
     def GET(self):
-        web.header('Content-Type', 'application/json')
-        return json.dumps(list(db.todos.find()), default=todo_json_encoding)
+        raise web.json(web.ok, data=list(db.todos.find()))
 
     def POST(self):
-        _id = db.todos.insert(json.loads(web.data()))
-        web.header('Content-Type', 'application/json')
-        res = json.dumps(db.todos.find_one(_id), default=todo_json_encoding)
-        raise web.created(res)
+        data = web.json_payload(web.data())
+        _id = db.todos.insert(data)
+        raise web.json(web.created, data=db.todos.find_one(_id))
         # raise custom_error(json.dumps(
         #     { u'message': u'Custom Error raised' }
         # ))
 
     def PUT(self, _id):
-        data = json.loads(web.data(), object_hook=todo_json_decoding)
+        data = web.json_payload(web.data())
         db.todos.save(data)
-
-        # res = json.dumps(db.todos.find_one(bson.objectid.ObjectId(_id)), default=todo_json_encoding)
         return web.no_content()
 
     def DELETE(self, _id):
-        db.todos.remove(bson.objectid.ObjectId(_id))
+        db.todos.remove(ObjectId(_id))
         return web.no_content()
 
 
