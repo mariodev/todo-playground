@@ -29,19 +29,19 @@ class todos:
 
     def POST(self):
         data = web.json_payload(web.data())
-        _id = db.todos.insert(data)
-        raise web.json(web.created, data=db.todos.find_one(_id))
+        db.todos.save(data, safe=True)
+        raise web.json(web.created, data=data)
         # raise custom_error(json.dumps(
         #     { u'message': u'Custom Error raised' }
         # ))
 
     def PUT(self, _id):
         data = web.json_payload(web.data())
-        db.todos.save(data)
+        db.todos.save(data, safe=True, multi=False)
         return web.no_content()
 
     def DELETE(self, _id):
-        db.todos.remove(ObjectId(_id))
+        db.todos.remove(ObjectId(_id), safe=True)
         return web.no_content()
 
 
