@@ -1,8 +1,15 @@
-import web, json, random
-import pymongo
+import json
+import random
 from bson.objectid import ObjectId
+
+import pymongo
+import web
 from utils import *
 
+class dict_(dict):
+
+    def json(self):
+        json.loads(data, object_hook=_todo_json_decoding)
 
 # set MongoDB connection  
 connection = pymongo.Connection("localhost", 27017)
@@ -25,18 +32,18 @@ class home:
 
 class todos:
     def GET(self):
-        raise web.json(web.ok, data=list(db.todos.find()))
+        raise json.response(web.ok, data=list(db.todos.find()))
 
     def POST(self):
-        data = web.json_payload(web.data())
+        data = json.request()
         db.todos.save(data, safe=True)
-        raise web.json(web.created, data=data)
+        raise json.response(web.created, data=data)
         # raise custom_error(json.dumps(
         #     { u'message': u'Custom Error raised' }
         # ))
 
     def PUT(self, _id):
-        data = web.json_payload(web.data())
+        data = json.request()
         db.todos.save(data, safe=True, multi=False)
         return web.no_content()
 

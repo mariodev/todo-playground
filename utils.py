@@ -9,19 +9,21 @@ Adding functions into web. namespace:
 `web.custom_error()`
 	: 416, custom error test
 
-`web.json_payload(data)`
+`json.request()`
 	: returns json structure loaded from request payload
 	  converts special keys e.g. _id => ObjectId
-	  web.json_payload(web.data())
+	  if no argument specified then json takes web.data() as payload
 	  
-`web.json(status_class[,data=''[,headers={}]])`
+`json.response(status_class[,data=''[,headers={}]])`
 	: returns response with json content
 	  converts special objects e.g. ObjectId => str
 	  'status_class' can be any valid status object, i.e. web.ok, web.created
 """
 
-import web, json
+import json
 from bson.objectid import ObjectId
+
+import web
 
 
 # custom RESTful response used when updating/deleting model
@@ -42,12 +44,13 @@ def _todo_json_decoding(obj):
         obj['_id'] = ObjectId(obj['_id'])
     return obj
 
-def _json_request(data):
-    return json.loads(data, object_hook=_todo_json_decoding)
-web.json_payload = _json_request
 
-def _json_response(status_class, data="", headers={}):
+def _request(data=web.data()):
+    return json.loads(data, object_hook=_todo_json_decoding)
+json.request = _request
+
+def _response(classname = web.ok, data="", headers={}, **kwargs):
     headers['Content-Type'] = 'application/json'
     data = json.dumps(data, default=_todo_json_encoding)
-    return status_class(data=data, headers=headers)
-web.json = _json_response
+    return classname(data, headers, **kwargs)
+json.response = _response
