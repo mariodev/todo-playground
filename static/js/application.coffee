@@ -108,10 +108,9 @@ class @NewTodoView extends Backbone.View
 		model = new Todo()
 		model.save {content: @$('.todo_title').val()},
 			success: =>
-				# console.log('added')
 				@collection.add(model)
 			error: (model, error) =>
-				# console.log error.responseText
+				# console.log error
 				if error.responseText?
 					error = JSON.parse(error.responseText)
 				alert error.message

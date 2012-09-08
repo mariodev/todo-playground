@@ -6,10 +6,6 @@ import pymongo
 import web
 from utils import *
 
-class dict_(dict):
-
-    def json(self):
-        json.loads(data, object_hook=_todo_json_decoding)
 
 # set MongoDB connection  
 connection = pymongo.Connection("localhost", 27017)
@@ -24,7 +20,14 @@ urls = (
 
 app = web.application(urls, globals())
 render = web.template.render('templates/')
+web.config.debug = False
 # session = web.session.Session(app, web.session.DiskStore('sessions'))
+
+# customize 500 error
+def internalerror():
+    return web.internalerror(json.dumps({'message': 'Internal server error.'}))
+app.internalerror = internalerror
+
 
 class home:
     def GET(self):

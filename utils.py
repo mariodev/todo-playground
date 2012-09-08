@@ -45,7 +45,9 @@ def _todo_json_decoding(obj):
     return obj
 
 
-def _request(data=web.data()):
+def _request(data = None):
+    if not data:
+        data = web.data()
     return json.loads(data, object_hook=_todo_json_decoding)
 json.request = _request
 
