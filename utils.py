@@ -22,6 +22,7 @@ Adding functions into web. namespace:
 
 import json
 from bson.objectid import ObjectId
+from bson.json_util import dumps, loads
 
 import web
 
@@ -32,27 +33,15 @@ web.no_content = web.NoContent = web.webapi._status_code("204 No Content")
 web.custom_error = web.CustomError = web.webapi._status_code("416 Error Test")
 
 
-# fix the ObjectId issue when encoding/decoding JSON object
-def _todo_json_encoding(obj):
-    if isinstance(obj, ObjectId):
-        return str(obj)
-    else:
-        return obj
-
-def _todo_json_decoding(obj):
-    if obj.has_key('_id'):
-        obj['_id'] = ObjectId(obj['_id'])
-    return obj
-
-
 def _request(data = None):
     if not data:
         data = web.data()
-    return json.loads(data, object_hook=_todo_json_decoding)
+    return loads(data)
 json.request = _request
 
 def _response(classname = web.ok, data="", headers={}, **kwargs):
     headers['Content-Type'] = 'application/json'
-    data = json.dumps(data, default=_todo_json_encoding)
+    headers['Charset'] = 'utf-8'
+    data = dumps(data)
     return classname(data, headers, **kwargs)
 json.response = _response

@@ -6,7 +6,7 @@ class @Todo extends Backbone.Model
 
 	url: ->
 		u = "/api/todos"
-		u += "/#{@get('_id')}" unless @isNew()
+		u += "/#{@get('_id')['$oid']}" unless @isNew()
 		return u
 
 	isNew: ->
