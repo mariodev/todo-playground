@@ -23,7 +23,7 @@ render = web.template.render('templates/')
 web.config.debug = True
 # session = web.session.Session(app, web.session.DiskStore('sessions'))
 
-customize 500 error
+# customize 500 error
 def internalerror():
     return web.internalerror(json.dumps({'message': 'Internal server error.'}))
 app.internalerror = internalerror
